@@ -423,6 +423,15 @@ const BIG_HORNS = [
   ".hd...ddhh....",
   "..hhhhhh......",
 ];
+// A single round lens, thin wire frame, transparent centre.
+const ROUND_LENS = [
+  ".gggg.",
+  "g....g",
+  "g....g",
+  "g....g",
+  "g....g",
+  ".gggg.",
+];
 const WIZARD = [
   "......p....",
   ".....ppp...",
@@ -549,6 +558,17 @@ const computePose = (a: Archetype, frame: number, fromStep: number | null, seed:
       break;
     }
     case "clap": {
+      // her signature artifact: three little juggling balls always looping round her, jester-style
+      for (let k = 0; k < 3; k++) {
+        const ang = frame / 14 + (k * Math.PI * 2) / 3 + seed;
+        p.fx.push({
+          kind: "spark",
+          x: 11 + Math.cos(ang) * 9,
+          y: 6 + Math.sin(ang) * 7 - 4,
+          a: 0.9,
+          color: ["#e0554d", "#f6d55c", "#4a9fd8"][k],
+        });
+      }
       // en face: arms flung wide and up between claps, hooves meet in front of the chest on the clap
       if (act) {
         const [h] = hits(20);
@@ -1188,18 +1208,20 @@ const FrontGoat: React.FC<{
     }
   }
   if (a.id === "arp" && !back) {
-    const fr = "#a39383";
-    for (const [i, gx] of [2, 9].entries()) {
-      const q = H(gx, 3);
-      n.push(<Box key={`gt${i}`} x={q.x} y={q.y} w={8} h={1} px={px} color={fr} />);
-      n.push(<Box key={`gb${i}`} x={q.x} y={q.y + 7} w={8} h={1} px={px} color={fr} />);
-      n.push(<Box key={`gl${i}`} x={q.x} y={q.y} w={1} h={8} px={px} color={fr} />);
-      n.push(<Box key={`gr${i}`} x={q.x + 7} y={q.y} w={1} h={8} px={px} color={fr} />);
+    // slim, elegant rose-gold wire frames
+    for (const gx of [3, 11]) {
+      const q = H(gx, 4);
+      n.push(<Spr key={`g${gx}`} outline={null} rows={ROUND_LENS} pal={{ g: "#c9a15a" }} x={q.x} y={q.y} px={px} />);
     }
+    n.push(<Box key="gbridge" x={H(8, 6).x} y={H(8, 6).y} w={2} h={1} px={px} color="#c9a15a" />);
   }
   if (a.id === "bass" && !back) {
-    n.push(<Box key="br1" x={H(2, 3).x} y={H(2, 3).y} w={6} h={1} px={px} color="#f6f6f2" />);
-    n.push(<Box key="br2" x={H(10, 3).x} y={H(10, 3).y} w={6} h={1} px={px} color="#f6f6f2" />);
+    // round Harry Potter-style wire glasses
+    for (const gx of [2.5, 10.5]) {
+      const q = H(gx, 3);
+      n.push(<Spr key={`g${gx}`} outline={null} rows={ROUND_LENS} pal={{ g: "#2b2530" }} x={q.x} y={q.y} px={px} />);
+    }
+    n.push(<Box key="gbridge" x={H(8, 5).x} y={H(8, 5).y} w={2} h={1} px={px} color="#2b2530" />);
     n.push(at("beard", BEARD, { e: "#f3f3ee", f: "#d0d0c8" }, 7 + p.swing, 15));
   }
   if (a.id === "kick") n.push(at("crown", CROWN, { y: "#e8b53c", R: "#e0554d", B: "#4a7fd8" }, 6.5, 0));
@@ -1415,23 +1437,21 @@ export const GoatActor: React.FC<{
     head.push(<Box key="b4" x={12} y={-1} w={4} h={1} px={px} color={K} />);
   }
   if (a.id === "bass") {
-    head.push(<Box key="br1" x={2} y={2} w={6} h={1} px={px} color="#f6f6f2" />);
-    head.push(<Box key="br2" x={8} y={0} w={8} h={1} px={px} color="#f6f6f2" />);
+    // round Harry Potter-style wire glasses
+    head.push(<Spr key="g1" outline={null} rows={ROUND_LENS} pal={{ g: "#2b2530" }} x={1} y={1} px={px} />);
+    head.push(<Spr key="g2" outline={null} rows={ROUND_LENS} pal={{ g: "#2b2530" }} x={8} y={-1} px={px} />);
+    head.push(<Box key="gbridge" x={6} y={3} w={3} h={1} px={px} color="#2b2530" />);
     head.push(<Spr key="beard" rows={BEARD} pal={{ e: "#f3f3ee", f: "#d0d0c8" }} x={1 + p.swing} y={13} px={px} />);
   }
   if (a.id === "arp") {
-    const fr = "#a39383";
-    head.push(<Box key="g1" x={2} y={2} w={8} h={1} px={px} color={fr} />);
-    head.push(<Box key="g2" x={2} y={9} w={8} h={1} px={px} color={fr} />);
-    head.push(<Box key="g3" x={2} y={2} w={1} h={8} px={px} color={fr} />);
-    head.push(<Box key="g4" x={8} y={0} w={9} h={1} px={px} color={fr} />);
-    head.push(<Box key="g5" x={8} y={8} w={9} h={1} px={px} color={fr} />);
-    head.push(<Box key="g6" x={16} y={0} w={1} h={9} px={px} color={fr} />);
-    head.push(<Box key="g7" x={8} y={2} w={1} h={7} px={px} color={fr} />);
-    head.push(<Box key="g8" x={17} y={3} w={3} h={1} px={px} color={fr} />);
+    // slim, elegant rose-gold wire frames, matching the front view
+    head.push(<Spr key="g1" outline={null} rows={ROUND_LENS} pal={{ g: "#c9a15a" }} x={1} y={1} px={px} />);
+    head.push(<Spr key="g2" outline={null} rows={ROUND_LENS} pal={{ g: "#c9a15a" }} x={8} y={-1} px={px} />);
+    head.push(<Box key="gbridge" x={6} y={3} w={3} h={1} px={px} color="#c9a15a" />);
+    head.push(<Box key="gtemple" x={14} y={0} w={4} h={1} px={px} color="#c9a15a" />);
     if (p.glint) {
-      head.push(<Box key="gl1" x={10} y={2} w={1} h={2} px={px} color="#ffffff" />);
-      head.push(<Box key="gl2" x={11} y={2} w={1} h={1} px={px} color="#ffffff" />);
+      head.push(<Box key="gl1" x={9} y={0} w={1} h={2} px={px} color="#ffffff" />);
+      head.push(<Box key="gl2" x={10} y={0} w={1} h={1} px={px} color="#ffffff" />);
     }
   }
   if (a.id === "shimmer") head.push(<Spr key="wizard" rows={WIZARD} pal={{ p: "#7b6fe0", y: "#f6d55c" }} x={7} y={-8} px={px} />);
