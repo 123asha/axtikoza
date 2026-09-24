@@ -195,6 +195,31 @@ const PAGES = [
 <script>window.GOAT_DEMO = 40;</script>
 <style>${PEN_CSS}</style>`,
   },
+  {
+    entry: "web/pen/roster.tsx",
+    out: "out/roster.html",
+    title: "Все козы",
+    head: `<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; background: #eef1f6; font-family: "Press Start 2P", ui-monospace, monospace; color: #3b2b31; }
+  .roster { max-width: 760px; margin: 0 auto; padding: 32px 20px 60px; }
+  h1 { font-size: 18px; font-weight: 400; margin: 0 0 6px; }
+  .hint { font-size: 10px; color: #6d6168; margin: 0 0 24px; }
+  .row { display: flex; align-items: center; gap: 18px; padding: 10px 14px; margin-bottom: 10px;
+         background: #ffffff; border: 2px solid #d8dde6; cursor: pointer; user-select: none; }
+  .row:hover { border-color: #b9c0cb; }
+  .row.on { border-color: #d4509f; background: #fff5fb; }
+  .stage-cell { position: relative; flex-shrink: 0; overflow: hidden; }
+  .info { flex: 1; min-width: 0; }
+  .name { font-size: 13px; margin-bottom: 6px; }
+  .role { font-size: 9px; color: #6d6168; }
+  .state { font-size: 9px; color: #857a80; white-space: nowrap; }
+  .row.on .state { color: #d4509f; }
+  .plate { display: none; }
+</style>`,
+  },
 ];
 
 mkdirSync("out", { recursive: true });

@@ -97,8 +97,8 @@ const rasterise = (rows: string[], pal: Pal, res: number, off: number) => {
 
 // Goat art: Scale2x rounds the contours, then it is resampled so one subpixel is ~4 screen px
 // at the pin size (4 px per sprite pixel) — the same pixel grain as the terrain.
-export const DETAIL = 2;
-export const RES = 2;
+export const DETAIL = 3;
+export const RES = 3;
 export const OUTLINE = "rgba(52,40,48,0.6)";
 
 // Offline stills capture before <img> paints, so previews draw sprites as pixel divs instead.
