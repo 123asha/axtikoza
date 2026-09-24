@@ -374,16 +374,20 @@ export const VOICES: Record<TrackId, Voice> = {
     const f = midiToHz(note.midi);
     const o = ctx.createOscillator();
     o.type = "square";
-    o.frequency.setValueAtTime(f * 0.97, t);
-    o.frequency.exponentialRampToValueAtTime(f, t + 0.04);
+    // a capricious little flounce into each note, then a whiny wobble and a pouty slide off the end
+    o.frequency.setValueAtTime(f * 0.9, t);
+    o.frequency.exponentialRampToValueAtTime(f * 1.03, t + 0.05);
+    o.frequency.exponentialRampToValueAtTime(f, t + 0.09);
+    o.frequency.setValueAtTime(f, t + Math.max(0.09, dur - 0.09));
+    o.frequency.exponentialRampToValueAtTime(f * 0.9, t + dur + 0.07);
     const o2 = ctx.createOscillator();
     o2.type = "triangle";
     o2.frequency.value = f * 2;
     const vib = ctx.createOscillator();
-    vib.frequency.value = 5.5;
+    vib.frequency.value = 6.8;
     const vibG = ctx.createGain();
     vibG.gain.setValueAtTime(0, t);
-    vibG.gain.linearRampToValueAtTime(f * 0.012, t + 0.25);
+    vibG.gain.linearRampToValueAtTime(f * 0.02, t + 0.2);
     vib.connect(vibG).connect(o.frequency);
     const lp = ctx.createBiquadFilter();
     lp.type = "lowpass";

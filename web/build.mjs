@@ -209,7 +209,7 @@ const PAGES = [
   .grid { display: grid; grid-template-columns: repeat(6, 230px); grid-auto-rows: 260px; gap: 20px; transform-origin: center center; flex-shrink: 0; }
   .slot { position: relative; width: 230px; height: 260px; cursor: pointer; user-select: none; }
   .slot:hover { filter: brightness(1.06); }
-  .slot.on { filter: drop-shadow(0 0 6px rgba(212,80,159,.5)); }
+  .slot.on { filter: drop-shadow(0 3px 5px rgba(60,64,74,.35)); }
   .plate { display: none; }
   .label { position: absolute; left: 0; right: 0; bottom: 0; text-align: center; font-size: 10px; color: #6d6168; }
 </style>`,
