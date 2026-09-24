@@ -686,9 +686,12 @@ const computePose = (a: Archetype, frame: number, fromStep: number | null, seed:
       break;
     }
     case "arp": {
-      // plays a little synth with both front hooves; one hoof taps on each note
+      // plays a little synth with both front hooves; one hoof taps on each note.
+      // She's concentrating, not looking around: eyes held low and still, on the keys.
       p.legs[0] = "F";
       p.legs[2] = "F";
+      p.eye = "wobble";
+      p.eyeSpeed = 0.015;
       if (act) {
         const i = Math.floor(stepF);
         const [ph] = hits(4);
@@ -699,8 +702,6 @@ const computePose = (a: Archetype, frame: number, fromStep: number | null, seed:
         }
         p.tail = i % 3;
         p.headDy = i % 4 === 0 ? 1 : 0;
-        p.eye = "wobble";
-        p.eyeSpeed = 0.2;
         p.glint = i % 16 < 2;
         for (const x of hits(30)) {
           if (x.globalStep % 4 !== 0 || x.ago > 26) continue;
