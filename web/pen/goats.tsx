@@ -207,6 +207,7 @@ type Pose = {
   // lit synth key (−1 = none)
   pipe: number;
   mudra: boolean;
+  rot: number;
   opacity: number;
   swing: number;
   glint: boolean;
@@ -487,6 +488,7 @@ const computePose = (a: Archetype, frame: number, fromStep: number | null, seed:
     sitting: false,
     pipe: -1,
     mudra: false,
+    rot: 0,
     opacity: 1,
     swing: 0,
     glint: false,
@@ -539,14 +541,30 @@ const computePose = (a: Archetype, frame: number, fromStep: number | null, seed:
       break;
     }
     case "hats": {
+      // breakdance: two beats of toprock, a full spin, then an upside-down freeze
       if (act) {
         const cyc = ["F", "A", "B", "L"] as LegKey[];
         const i = Math.floor(stepF);
-        p.legs = [cyc[(i + 2) % 4], cyc[i % 4], cyc[i % 4], cyc[(i + 2) % 4]];
-        p.dy = i % 2 ? -1 : 0;
-        const [h] = hits(6);
-        p.headDy = h && h.note.vel > 0.9 && h.ago < 3 ? 1 : 0;
+        const shift = seed % 4;
+        const b = (Math.floor(beat) + shift) % 4;
+        const f = beat % 1;
+        if (b < 2) {
+          p.legs = [cyc[(i + 2) % 4], cyc[i % 4], cyc[(i + 1) % 4], cyc[(i + 3) % 4]];
+          p.legs[0] = i % 2 ? "L" : "F";
+          p.legs[2] = i % 2 ? "F" : "L";
+          p.dy = i % 2 ? -2 : 0;
+          p.dx = i % 4 < 2 ? -1 : 1;
+        } else if (b === 2) {
+          p.rot = f * 360;
+          p.legs = ["L", "L", "L", "L"];
+          p.dy = -3;
+        } else {
+          p.rot = f < 0.75 ? 180 : 180 + ((f - 0.75) / 0.25) * 180;
+          p.legs = ["L", "F", "L", "B"];
+          p.dy = -8;
+        }
         p.tail = i % 3;
+        p.eye = b === 2 ? "spin" : "wobble";
         p.eyeSpeed = 0.9;
       }
       break;
@@ -1431,7 +1449,8 @@ export const GoatActor: React.FC<{
         style={{
           position: "absolute",
           inset: 0,
-          transform: `translate(${p.dx * px}px, ${p.dy * px}px) ${flip ? "scaleX(-1)" : ""}`,
+          transform: `translate(${p.dx * px}px, ${p.dy * px}px) rotate(${p.rot}deg) ${flip ? "scaleX(-1)" : ""}`,
+          transformOrigin: `50% ${20 * px}px`,
           opacity: p.opacity,
         }}
       >
