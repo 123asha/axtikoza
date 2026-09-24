@@ -618,12 +618,12 @@ const computePose = (a: Archetype, frame: number, fromStep: number | null, seed:
       p.eyeSpeed = 0.06;
       p.mouth = 3;
       if (act) {
-        // a gentle, girlish little hop on every beat, not a big leap
+        // a soft, tender little hop every other beat, not a big leap
         const lift = Math.min(1, inActive / 20);
-        const hopPhase = beat % 1;
-        p.dy = -Math.round(lift * Math.max(0, Math.sin(hopPhase * Math.PI)) * 4);
+        const hopPhase = (beat / 2) % 1;
+        p.dy = -Math.round(lift * Math.max(0, Math.sin(hopPhase * Math.PI)) * 2.5);
         // both little hands wave up on the hop
-        const waving = hopPhase < 0.6;
+        const waving = hopPhase < 0.5;
         p.legs = [waving ? "L" : "A", "A", waving ? "L" : "A", "A"];
         p.tail = Math.floor(frame / 10) % 3;
         const period = 20;
