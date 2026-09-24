@@ -204,14 +204,14 @@ const PAGES = [
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
   html, body { margin: 0; background: #eef1f6; font-family: "Press Start 2P", ui-monospace, monospace; color: #3b2b31; }
-  .roster { max-width: 1400px; margin: 0 auto; padding: 32px 20px 60px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
-  .card { display: flex; align-items: center; justify-content: center; padding: 10px;
-          background: #ffffff; border: 2px solid #d8dde6; cursor: pointer; user-select: none; }
-  .card:hover { border-color: #b9c0cb; }
-  .card.on { border-color: #d4509f; background: #fff5fb; }
-  .stage-cell { position: relative; flex-shrink: 0; overflow: hidden; }
+  html, body, #root { height: 100%; overflow: hidden; }
+  .roster { height: 100%; display: flex; align-items: center; justify-content: center; box-sizing: border-box; }
+  .grid { display: grid; grid-template-columns: repeat(6, 230px); grid-auto-rows: 260px; gap: 20px; transform-origin: center center; flex-shrink: 0; }
+  .slot { position: relative; width: 230px; height: 260px; cursor: pointer; user-select: none; }
+  .slot:hover { filter: brightness(1.06); }
+  .slot.on { filter: drop-shadow(0 0 6px rgba(212,80,159,.5)); }
   .plate { display: none; }
+  .label { position: absolute; left: 0; right: 0; bottom: 0; text-align: center; font-size: 10px; color: #6d6168; }
 </style>`,
   },
 ];

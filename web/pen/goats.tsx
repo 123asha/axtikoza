@@ -541,30 +541,21 @@ const computePose = (a: Archetype, frame: number, fromStep: number | null, seed:
       break;
     }
     case "hats": {
-      // breakdance: two beats of toprock, a full spin, then an upside-down freeze
+      // light, easy footwork: a toprock side-step shuffle with a gentle sway and a little hop
       if (act) {
         const cyc = ["F", "A", "B", "L"] as LegKey[];
         const i = Math.floor(stepF);
         const shift = seed % 4;
         const b = (Math.floor(beat) + shift) % 4;
-        const f = beat % 1;
-        if (b < 2) {
-          p.legs = [cyc[(i + 2) % 4], cyc[i % 4], cyc[(i + 1) % 4], cyc[(i + 3) % 4]];
-          p.legs[0] = i % 2 ? "L" : "F";
-          p.legs[2] = i % 2 ? "F" : "L";
-          p.dy = i % 2 ? -2 : 0;
-          p.dx = i % 4 < 2 ? -1 : 1;
-        } else if (b === 2) {
-          p.rot = f * 360;
-          p.legs = ["L", "L", "L", "L"];
-          p.dy = -3;
-        } else {
-          p.rot = f < 0.75 ? 180 : 180 + ((f - 0.75) / 0.25) * 180;
-          p.legs = ["L", "F", "L", "B"];
-          p.dy = -8;
-        }
+        p.legs = [cyc[(i + 2) % 4], cyc[i % 4], cyc[(i + 1) % 4], cyc[(i + 3) % 4]];
+        p.legs[0] = i % 2 ? "L" : "F";
+        p.legs[2] = i % 2 ? "F" : "L";
+        p.dy = i % 2 ? -1 : 0;
+        p.dx = i % 4 < 2 ? -1 : 1;
+        p.rot = Math.sin((beat / 4) * Math.PI * 2) * 8;
+        p.headDy = b === 0 ? -1 : 0;
         p.tail = i % 3;
-        p.eye = b === 2 ? "spin" : "wobble";
+        p.eye = "wobble";
         p.eyeSpeed = 0.9;
       }
       break;
@@ -680,14 +671,18 @@ const computePose = (a: Archetype, frame: number, fromStep: number | null, seed:
       break;
     }
     case "bell": {
+      // big obvious head-shake ringing the bell on its neck
       if (act) {
         const [h] = hits(12);
-        if (h && h.ago < 6) {
+        if (h && h.ago < 8) {
           const dir = h.globalStep % 2 ? 1 : -1;
-          p.headDx = dir;
+          const swing = Math.sin((h.ago / 8) * Math.PI);
+          p.headDx = Math.round(dir * (1 + swing * 2));
+          p.headDy = h.ago < 3 ? -1 : 0;
           p.swing = -dir;
-          p.fx.push({ kind: "spark", x: 12 - dir * 3, y: 16 - h.ago * 0.3, a: pulse(h.ago, 6), color: "#f2d26b" });
-          p.fx.push({ kind: "spark", x: 20 + dir * 3, y: 15 - h.ago * 0.3, a: pulse(h.ago, 6), color: "#f2d26b" });
+          p.bodyDy = h.ago < 4 ? 1 : 0;
+          p.fx.push({ kind: "spark", x: 12 - dir * 4, y: 15 - h.ago * 0.3, a: pulse(h.ago, 8), color: "#f2d26b" });
+          p.fx.push({ kind: "spark", x: 20 + dir * 4, y: 14 - h.ago * 0.3, a: pulse(h.ago, 8), color: "#f2d26b" });
         }
         p.tail = Math.floor(beat) % 2;
         p.eyeSpeed = 0.35;
@@ -818,6 +813,34 @@ const computePose = (a: Archetype, frame: number, fromStep: number | null, seed:
         }
         if (p.eye === "wobble") p.eye = "up";
         break;
+    }
+  }
+  // Silhouette: each archetype carries itself its own way, even standing still.
+  if (!p.lying && !p.sitting && p.rot === 0) {
+    if (a.id === "kick") p.headDy -= 1; // the ruler: chin up
+    if (a.id === "arp") p.headDy += 1; // the creator: hunched over the keys
+    if (a.id === "toms") p.legs = [p.legs[0] === "A" ? "F" : p.legs[0], p.legs[1], p.legs[2], p.legs[3] === "A" ? "B" : p.legs[3]]; // the hero: wide stance
+    if (a.id === "lead") p.headDx += 1; // the rebel: head pushed forward
+  }
+  // Startle: the first half-second after being switched on, each goat reacts in its own way.
+  if (act && inActive < 16) {
+    const t = inActive;
+    const up = t < 8 ? -Math.round(3 * Math.sin((t / 8) * Math.PI)) : 0;
+    p.eye = "shock";
+    p.rot = 0;
+    switch (a.id) {
+      case "kick": p.headDy = -2; p.fx.push({ kind: "spark", x: 11, y: -1, a: 1 - t / 16, color: "#f6d55c" }); break;
+      case "clap": p.dy = up; p.legs = ["L", "L", "L", "L"]; break;
+      case "hats": p.dx = t < 8 ? -2 : -1; break;
+      case "bass": p.eye = t < 10 ? "shock" : "half"; break;
+      case "pad": p.fx.push({ kind: "heart", x: 16, y: 2 - t * 0.4, a: 1 - t / 16 }); break;
+      case "lead": p.headDx = 2; p.mouth = 2; break;
+      case "arp": p.glint = true; p.headDy = -1; break;
+      case "bleat": p.headDx = -1; p.mouth = 2; break;
+      case "bell": p.headDx = t % 4 < 2 ? 2 : -2; break;
+      case "toms": p.dy = up; p.legs = ["L", "F", "L", "F"]; break;
+      case "shimmer": p.opacity = t % 4 < 2 ? 0.35 : 1; break;
+      case "snore": p.eye = "shock"; break;
     }
   }
   return p;
@@ -1294,11 +1317,14 @@ export const GoatActor: React.FC<{
     head.push(<Box key="c3" x={14} y={6} w={1} h={1} px={px} color={K} />);
   } else {
     const st = EYE_STYLES[a.id];
+    // a touch of per-goat face variety: small eye-position jitter, skipped where glasses/frames
+    // are fixed to the eye spots (would go out of register)
+    const jitter = a.id === "arp" ? 0 : ((seed * 37) % 5) / 5 - 0.4;
     head.push(
-      <Eye key="e1" cx={5.5} cy={5.5} size={st.small} st={st} px={px} frame={frame} seed={seed * 2} mode={p.eye} speed={p.eyeSpeed} rim={rim} lid={a.fur.w} blink={blink} gaze={gaze} />,
+      <Eye key="e1" cx={5.5 + jitter} cy={5.5 - jitter * 0.5} size={st.small} st={st} px={px} frame={frame} seed={seed * 2} mode={p.eye} speed={p.eyeSpeed} rim={rim} lid={a.fur.w} blink={blink} gaze={gaze} />,
     );
     head.push(
-      <Eye key="e2" cx={12} cy={4} size={st.big} st={st} px={px} frame={frame} seed={seed * 2 + 1} mode={p.eye} speed={p.eyeSpeed} rim={rim} lid={a.fur.w} blink={blink} gaze={gaze} />,
+      <Eye key="e2" cx={12 - jitter} cy={4 + jitter * 0.5} size={st.big} st={st} px={px} frame={frame} seed={seed * 2 + 1} mode={p.eye} speed={p.eyeSpeed} rim={rim} lid={a.fur.w} blink={blink} gaze={gaze} />,
     );
   }
 
