@@ -21,6 +21,23 @@ export type Archetype = {
 
 const K = "#3b2b31";
 
+// A silhouette squash/stretch per archetype, anchored at the feet, so each is recognisable by
+// shape alone at a glance: regal and tall, stocky and grounded, lean and angular, and so on.
+const SILHOUETTE: Record<TrackId, { sx: number; sy: number }> = {
+  kick: { sx: 0.94, sy: 1.12 }, // ruler: tall, narrow, commanding
+  clap: { sx: 1.08, sy: 0.9 }, // jester: squat and bouncy
+  hats: { sx: 0.9, sy: 1.06 }, // innocent: slight and delicate
+  bass: { sx: 1.12, sy: 0.88 }, // sage: low, wide, grounded like a yogi
+  pad: { sx: 0.9, sy: 1.08 }, // lover: slender and elegant
+  lead: { sx: 0.86, sy: 1.12 }, // rebel: lean, angular, tall
+  arp: { sx: 1.0, sy: 0.94 }, // creator: a touch hunched over her work
+  bleat: { sx: 0.88, sy: 1.14 }, // explorer: rangy and long-legged
+  bell: { sx: 1.0, sy: 1.0 }, // everyman: the baseline
+  toms: { sx: 1.16, sy: 0.94 }, // hero: broad-shouldered and stocky
+  shimmer: { sx: 0.85, sy: 1.16 }, // magician: tall and ethereal
+  snore: { sx: 1.14, sy: 0.9 }, // caregiver: round, soft, squat
+};
+
 export const ARCHETYPES: Archetype[] = [
   {
     id: "kick",
@@ -1576,7 +1593,7 @@ export const GoatActor: React.FC<{
         style={{
           position: "absolute",
           inset: 0,
-          transform: `translate(${p.dx * px}px, ${p.dy * px}px) rotate(${p.rot}deg) ${flip ? "scaleX(-1)" : ""}`,
+          transform: `translate(${p.dx * px}px, ${p.dy * px}px) rotate(${p.rot}deg) ${flip ? "scaleX(-1)" : ""} scale(${SILHOUETTE[a.id].sx}, ${SILHOUETTE[a.id].sy})`,
           transformOrigin: `50% ${20 * px}px`,
           opacity: p.opacity,
         }}
